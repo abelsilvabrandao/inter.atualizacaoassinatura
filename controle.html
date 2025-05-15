@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Painel de Controle de Assinaturas</title>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script type="module" src="controle.js" defer></script>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #006400;
+  --secondary-color: #008000;
+  --accent-color: #90EE90;
+  --text-color: #004d00;
+  --light-bg: #E8F5E9;
+  --border-color: #90EE90;
+  --white: #FFFFFF;
+  --error: #D32F2F;
+  --warning: #FFA000;
+  --success: #006400;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      line-height: 0.9;
+      color: var(--text-color);
+      background-color: var(--light-bg);
+      margin: 0;
+      padding: 0;
+    }
+
+    .header {
+      background-color: white;
+      padding: 20px 0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      position: relative;
+    }
+
+    .logo-container {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .logo-container img {
+      height: 60px;
+      width: auto;
+    }
+
+    .container {
+      max-width: 95%;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    @media (min-width: 1600px) {
+      .container {
+        max-width: 1800px;
+      }
+    }
+
+    .page-title {
+      color: var(--primary-color);
+      text-align: center;
+      margin: 30px 0;
+      font-size: 2em;
+    }
+
+    .filter-section {
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      margin-bottom: 30px;
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .filter-group {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .filter-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--primary-color);
+      font-weight: 500;
+    }
+
+    .filter-group input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid var(--border-color);
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    .filter-buttons {
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+    }
+
+    button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .acoes-column {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    .acoes-wrapper {
+      display: flex;
+      gap: 8px;
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+      align-items: center;
+    }
+
+    .table-container::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    .table-container::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 4px;
+    }
+
+    .table-container::-webkit-scrollbar-thumb {
+      background: var(--primary-color);
+      border-radius: 4px;
+    }
+
+    .table-container::-webkit-scrollbar-thumb:hover {
+      background: var(--secondary-color);
+    }
+
+    .acoes-btn {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .aprovar-btn {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .visualizar-btn {
+      background-color: #17a2b8;
+      color: white;
+    }
+
+    .visualizar-btn:hover {
+      background-color: #138496;
+    }
+
+    .apagar-btn {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    .apagar-btn:hover {
+      background-color: #c82333;
+    }
+
+    #filtrarBtn {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    #filtrarBtn:hover {
+      background-color: var(--secondary-color);
+    }
+
+    #limparBtn {
+      background-color: #6c757d;
+      color: white;
+    }
+
+    #limparBtn:hover {
+      background-color: #5a6268;
+    }
+
+    .table-container {
+      overflow-x: auto;
+      margin: 20px 0;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      background-color: white;
+    }
+
+    .metrics-toggle {
+      margin: 10px 0;
+      text-align: right;
+    }
+
+    .metrics-btn {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9em;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .metrics-btn:hover {
+      background-color: var(--secondary-color);
+    }
+
+    .metrics-btn i {
+      transition: transform 0.2s;
+    }
+
+    .metrics-btn.active i {
+      transform: rotate(180deg);
+    }
+
+    .table-container {
+      overflow-x: auto;
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      background-color: white;
+      table-layout: auto;
+    }
+
+    table th:first-child {
+      border-top-left-radius: 10px;
+    }
+
+    table th:last-child {
+      border-top-right-radius: 10px;
+    }
+
+    th {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 2px 6px;
+      text-align: left;
+      font-weight: 500;
+      position: sticky;
+      top: 0;
+      line-height: 0.9;
+      z-index: 10;
+    }
+
+    th, td {
+      padding: 10px 13px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 200px;
+    }
+
+    td.expandable {
+      max-width: 300px;
+      white-space: normal;
+      line-height: 0.9;
+    }
+
+    td {
+      padding: 10px 13px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    #tabelaColaboradores tbody td {
+      padding: 4px 8px;
+      line-height: 1;
+      font-size: 14px; /* ou ajuste conforme o visual desejado */
+    }
+
+    .metrics-row {
+      display: none;
+    }
+
+    .metrics-row.visible {
+      display: table-row !important;
+    }
+
+    .metrics-btn.active i {
+      transform: rotate(180deg);
+    }
+
+    .metrics-cell {
+      padding: 0;
+      font-size: 0.9em;
+      background-color: transparent;
+    }
+
+    .metrics-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 8px;
+      background-color: #f8f9fa;
+      border-radius: 4px;
+      margin: 4px;
+    }
+
+    .metric-item {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      padding: 2px 0;
+    }
+
+    .metric-label {
+      color: #6c757d;
+      font-size: 0.85em;
+      min-width: 85px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .metric-value {
+      color: #212529;
+      font-size: 0.9em;
+    }
+
+    .details-cell {
+      padding: 20px;
+    }
+
+    .details-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      background-color: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+    }
+
+    .details-item {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .details-label {
+      font-weight: 500;
+      color: var(--primary-color);
+      font-size: 0.9em;
+    }
+
+    .details-value {
+      font-size: 1em;
+    }
+
+    .expand-btn {
+      background: none;
+      border: none;
+      color: var(--primary-color);
+      cursor: pointer;
+      padding: 5px;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+
+    .expand-btn:hover {
+      background-color: var(--light-bg);
+    }
+
+    .expand-btn i {
+      transition: transform 0.2s;
+    }
+
+    .expand-btn.expanded i {
+      transform: rotate(180deg);
+    }
+
+    /* Larguras específicas para cada coluna */
+    th:nth-child(1), td:nth-child(1) { min-width: 200px; } /* Nome */
+    th:nth-child(2), td:nth-child(2) { min-width: 150px; } /* Unidade */
+    th:nth-child(3), td:nth-child(3) { min-width: 150px; } /* Setor */
+    /* Larguras mínimas das colunas */
+    th:nth-child(1), td:nth-child(1) { min-width: 200px; } /* Nome */
+    th:nth-child(2), td:nth-child(2) { min-width: 120px; } /* Unidade */
+    th:nth-child(3), td:nth-child(3) { min-width: 180px; } /* Setor */
+    th:nth-child(4), td:nth-child(4) { min-width: 250px; } /* Email */
+    th:nth-child(5), td:nth-child(5) { min-width: 120px; } /* Telefone */
+    th:nth-child(6), td:nth-child(6) { min-width: 120px; } /* Celular */
+    th:nth-child(7), td:nth-child(7) { min-width: 150px; } /* Status */
+    th:nth-child(8), td:nth-child(8) { min-width: 120px; } /* Ações */
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover {
+      background-color: var(--light-bg);
+    }
+
+    .status-pendente {
+      color: #ffc107;
+      font-weight: 500;
+    }
+
+    .status-aprovado {
+      color: #28a745;
+      font-weight: 500;
+    }
+
+    .status-rejeitado {
+      color: #dc3545;
+      font-weight: 500;
+    }
+
+    .status-no-prazo {
+      color: #28a745;
+      font-weight: 500;
+    }
+
+    .status-atrasado {
+      color: #dc3545;
+      font-weight: 500;
+    }
+
+    .prazo {
+      white-space: nowrap;
+    }
+
+    .data {
+      white-space: nowrap;
+    }
+
+    .acoes-btn {
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 14px;
+      margin: 0 5px;
+    }
+
+    .aprovar-btn {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .rejeitar-btn {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    .acoes-btn:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    .loading-message,
+    .no-results,
+    .error-message {
+      text-align: center;
+      padding: 20px;
+      font-size: 1.1em;
+    }
+
+    .loading-message i,
+    .no-results i,
+    .error-message i {
+      margin-right: 8px;
+    }
+
+    .loading-message {
+      color: var(--secondary-color);
+    }
+
+    .no-results {
+      color: var(--text-color);
+    }
+
+    .error-message {
+      color: #dc3545;
+    }
+
+    .status-finalizado {
+      color: #28a745;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .status-container {
+      width: 100%;
+    }
+
+    .status-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .metrics-info {
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 8px;
+      font-size: 0.9em;
+      color: var(--text-color);
+      border-left: 2px solid var(--border-color);
+      padding-left: 12px;
+      margin-left: 4px;
+    }
+
+    .metrics-info.visible {
+      display: flex;
+    }
+
+    .metric-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .metric-item i {
+      font-size: 0.9em;
+      color: var(--primary-color);
+      width: 14px;
+    }
+
+    td {
+      padding: 4px 12px;
+      white-space: pre-wrap;
+      overflow: visible;
+      text-overflow: clip;
+      min-width: 0;
+      user-select: text;
+      cursor: text;
+      height: auto;
+      line-height: 0.9;
+    }
+
+    td > div {
+      display: block;
+      width: 100%;
+    }
+
+    /* Estilo para o texto dentro das células */
+    td span, td a {
+      display: inline-block;
+      width: 100%;
+      overflow: visible;
+      text-overflow: clip;
+      white-space: pre-wrap;
+      word-break: break-word;
+      user-select: all;
+    }
+
+    th:nth-child(7), td:nth-child(7) {
+      min-width: 250px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo-container">
+      <img src="logo.png" alt="Logo da Empresa" class="logo">
+    </div>
+  </div>
+
+  <div class="container">
+    <h1 class="page-title">Controle de Assinaturas</h1>
+    <div class="metrics-toggle">
+      <button class="metrics-btn" onclick="toggleMetrics()">
+        <i class="fas fa-chart-line"></i> Métricas e Prazos
+      </button>
+    </div>
+
+    <div class="filter-section">
+        <div class="filter-group">
+          <label for="filterUnidade">
+            <i class="fas fa-building"></i>
+            Unidade:
+          </label>
+          <select id="filterUnidade">
+          <option value="">Todas as unidades</option>
+          <option value="INTERSAL">INTERSAL</option>
+          <option value="CDEX - QSMS">CDEX - QSMS</option>
+          <option value="ILHÉUS">ILHÉUS</option>
+          <option value="ARATU">ARATU</option>
+          <option value="CDEX I">CDEX I</option>
+          <option value="MACEIÓ">MACEIÓ</option>
+          <option value="TRANSPORTE">TRANSPORTE</option>
+          <option value="TPS">TPS</option>
+          <option value="INTER 2">INTER 2</option>
+          <option value="CDEX II">CDEX II</option>
+          <option value="INTER 1">INTER 1</option>
+          <option value="TMI">TMI</option>
+          <option value="TMG">TMG</option>
+          <option value="WIND HUB - JC">WIND HUB - JC (João Câmara)</option>
+          <option value="SEDE">SEDE</option>
+        </select>
+      </div>
+      
+      <div class="filter-group">
+        <label for="filtroSetor">
+          <i class="fas fa-sitemap"></i>
+          Filtrar por Setor:
+        </label>
+        <input type="text" id="filtroSetor" placeholder="Digite o setor" />
+      </div>
+
+      <div class="filter-group">
+        <label for="filtroStatus">
+          <i class="fas fa-info-circle"></i>
+          Filtrar por Status:
+        </label>
+        <select id="filtroStatus">
+          <option value="">Todos os status</option>
+          <option value="Pendente">Pendente</option>
+          <option value="Assinatura Enviada">Assinatura Enviada</option>
+        </select>
+      </div>
+      
+      <div class="filter-buttons">
+        <button id="filtrarBtn">
+          <i class="fas fa-filter"></i>
+          Filtrar
+        </button>
+        <button id="limparBtn">
+          <i class="fas fa-eraser"></i>
+          Limpar
+        </button>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table id="tabelaColaboradores">
+      <thead>
+        <tr>
+          <th><i class="fas fa-user"></i> Nome</th>
+          <th><i class="fas fa-building"></i> Unidade</th>
+          <th><i class="fas fa-sitemap"></i> Setor</th>
+          <th><i class="fas fa-envelope"></i> E-mail</th>
+          <th><i class="fas fa-phone-alt"></i> Telefone</th>
+          <th><i class="fas fa-mobile-alt"></i> Celular</th>
+          <th><i class="fas fa-info-circle"></i> Status</th>
+          <th><i class="fas fa-cogs"></i> Ações</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+</body>
+</html>

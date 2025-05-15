@@ -1,0 +1,13 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /colaboradores/{cpf} {
+      allow read, write: if true;  // Temporarily allow all access for testing
+      // In production, you should replace this with more secure rules
+      // For example:
+      // allow read: if request.auth != null;
+      // allow write: if request.auth != null;
+    }
+  }
+}
