@@ -35,6 +35,7 @@ async function carregarColaboradores(unidade = "", setor = "", status = "") {
     const colaboradoresRef = collection(db, "colaboradores");
     let q = colaboradoresRef;
 
+
     if (unidade) q = query(q, where("unidade", "==", unidade));
     if (setor) q = query(q, where("setor", "==", setor));
     if (status) q = query(q, where("status", "==", status));
@@ -50,11 +51,25 @@ async function carregarColaboradores(unidade = "", setor = "", status = "") {
           </td>
         </tr>
       `;
+            // Atualizar contadores para zero
+      atualizarContadores(0, 0);
       return;
     }
 
+        // Inicializar contadores
+    let pendentes = 0;
+    let concluidos = 0;
+
     querySnapshot.forEach((docSnap) => {
       const data = docSnap.data();
+      // Contar status
+      if (data.status.toLowerCase() === 'pendente') {
+        pendentes++;
+      } else if (data.status.toLowerCase() === 'assinatura enviada') {
+        concluidos++;
+      }
+      
+
       const tr = document.createElement("tr");
 
       // Define status class and icon
@@ -176,6 +191,10 @@ async function carregarColaboradores(unidade = "", setor = "", status = "") {
       tr.insertAdjacentElement('afterend', metricsRow);
       tabela.appendChild(tr);
     });
+
+        // Atualizar os contadores no display
+    atualizarContadores(pendentes, concluidos);
+
   } catch (error) {
     console.error('Erro ao carregar colaboradores:', error);
     tabela.innerHTML = `
@@ -186,6 +205,17 @@ async function carregarColaboradores(unidade = "", setor = "", status = "") {
       </tr>
     `;
   }
+}
+
+// Função auxiliar para atualizar os contadores no display
+function atualizarContadores(pendentes, concluidos) {
+  const pendentesCountElem = document.getElementById('pendentesCount');
+  const concluidosCountElem = document.getElementById('concluidosCount');
+  const totalCountElem = document.getElementById('totalCount');
+
+  if (pendentesCountElem) pendentesCountElem.textContent = pendentes;
+  if (concluidosCountElem) concluidosCountElem.textContent = concluidos;
+  if (totalCountElem) totalCountElem.textContent = pendentes + concluidos;
 }
 
 window.apagarRegistro = async (cpf) => {
