@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
     :root {
       --primary-color: #006400;
@@ -185,6 +186,15 @@
     #filtrarBtn {
       background-color: var(--primary-color);
       color: white;
+    }
+
+    #download-excel-button {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    #download-excel-button:hover {
+      background-color: var(--secondary-color);
     }
 
     #filtrarBtn:hover {
@@ -582,11 +592,26 @@
   </style>
 </head>
 <body>
-  <div class="header">
-    <div class="logo-container">
-      <img src="logo.png" alt="Logo da Empresa" class="logo">
+  <div class="header" style="display: flex; justify-content: space-between; align-items: center; padding: 0 30px;">
+  <div class="logo-container">
+    <img src="logo.png" alt="Logo da Empresa" class="logo">
+  </div>
+  <div class="auth-area" style="display: flex; align-items: center; gap: 12px;">
+    <div id="loginDisplay" style="display: none;">
+      <button id="loginPageBtn" style="display: flex; align-items: center; gap: 6px; background-color: var(--primary-color); color: white; border: none; border-radius: 4px; padding: 6px 12px; cursor: pointer;">
+        <i class="fas fa-user-shield"></i>
+        Login
+      </button>
+    </div>
+    <div id="responsavelDisplay" style="display: none; align-items: center; gap: 10px; font-weight: 600; color: var(--primary-color);">
+      <i class="fas fa-user-shield"></i>
+      <span><i class="fas fa-user"></i> <span id="responsavelNome"></span></span>
+      <button id="logoutBtn" style="padding: 5px 10px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">
+       <i class="fas fa-power-off"></i>
+      </button>
     </div>
   </div>
+</div>
 
   <div class="container">
     <h1 class="page-title">Controle de Assinaturas</h1>
@@ -618,18 +643,6 @@
     <p id="loginError" style="color: red; margin-top: 12px; display: none; text-align: center;"></p>
   </div>
 </div>
-
-
-
-<div id="responsavelDisplay" style="margin: 10px 0; font-weight: 600; color: var(--primary-color); display: flex; align-items: center; gap: 10px;">
-  <span>Responsável: Ilmar</span>
-  <button id="logoutBtn" style="padding: 5px 10px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">Sair</button>
-</div>
-<div id="loginDisplay" style="margin: 10px 0; font-weight: 600; color: var(--primary-color); display: none;">
-  <button id="loginPageBtn" style="padding: 5px 10px; background-color: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer;">Login</button>
-</div>
-
-
 
     <div class="filter-section">
         <div class="filter-group">
@@ -688,6 +701,12 @@
           Limpar
         </button>
       </div>
+      <div class="export-section">
+  <button id="download-excel-button" class="btn-download" title="Download Excel">
+    <i class="fas fa-file-excel"></i> Exportar Excel
+  </button>
+</div>
+
     </div>
 
     <!-- Início do display de status -->
@@ -703,7 +722,6 @@
   </div>
 </div>
 <!-- Fim do display de status -->
-
 
     <div class="table-container">
       <table id="tabelaColaboradores">

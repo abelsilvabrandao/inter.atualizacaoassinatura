@@ -31,6 +31,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+let metricasVisiveis = false;
+
 // Função para mostrar o modal de login
 function mostrarModalLogin() {
   const modal = document.getElementById('loginModal');
@@ -120,8 +122,8 @@ function mostrarResponsavel(email) {
     if (container) container.insertBefore(respElem, container.firstChild);
   }
   respElem.innerHTML = `
-    <span>Responsável: ${nome}</span>
-    <button id="logoutBtn" style="padding: 5px 10px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">Sair</button>
+    <span><i class="fas fa-user"></i> ${nome}</span>
+    <button id="logoutBtn" style="padding: 5px 10px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;"><i class="fas fa-power-off"></i></button>
   `;
 
   // Reatribuir evento ao botão logout
@@ -278,7 +280,7 @@ colaboradores.forEach((data) => {
     <td class="${statusClass}">
       <div class="status-container">
         <div class="status-header">
-          <span><i class="fas fa-${statusIcon}"></i> ${data.status}${statusPrazo}</span>
+          <span><i class="fas fa-${statusIcon}"></i> ${data.status}</span>
         </div>
         ${data.dataEnvio ? `
           <div class="metrics-info" style="display: none;">
@@ -318,7 +320,6 @@ colaboradores.forEach((data) => {
       </div>
     </td>
   `;
-
       // Linha de métricas (oculta por padrão)
       const metricsRow = document.createElement('tr');
       metricsRow.className = 'metrics-row';
@@ -348,8 +349,14 @@ metricsRow.innerHTML = `
         <div class="metric-label">
           <i class="fas fa-calendar-check"></i> Conclusão:
         </div>
-        <div class="metric-value">${dataConclusao ? formatarData(dataConclusao) : '-'}</div>
+      <div class="metric-item">
+      <div class="metric-label">
+      <i class="fas fa-calendar-check"></i> Conclusão:
       </div>
+  <div class="metric-value">
+    ${dataConclusao ? formatarData(dataConclusao) + statusPrazo : '-'}
+  </div>
+</div>
       <div class="metric-item">
         <div class="metric-label">
           <i class="fas fa-user"></i> Responsável:
@@ -362,7 +369,8 @@ metricsRow.innerHTML = `
 `;
       tabela.appendChild(metricsRow);
       tr.insertAdjacentElement('afterend', metricsRow);
-      tabela.appendChild(tr);
+      tabela.appendChild(tr);         // adiciona o colaborador primeiro
+      tabela.appendChild(metricsRow); // depois a linha de métricas
     });
 
         // Atualizar os contadores no display
@@ -378,6 +386,13 @@ metricsRow.innerHTML = `
       </tr>
     `;
   }
+  aplicarVisibilidadeDasMetricas(); // já está sendo chamado
+const metricsBtn = document.querySelector('.metrics-btn');
+if (metricasVisiveis) {
+  metricsBtn.classList.add('active');
+} else {
+  metricsBtn.classList.remove('active');
+}
 }
 
 // Adicionar listener para filtroStatus para carregar dados ao mudar seleção
@@ -395,6 +410,7 @@ function atualizarContadores(pendentes, concluidos) {
   if (pendentesCountElem) pendentesCountElem.textContent = pendentes;
   if (concluidosCountElem) concluidosCountElem.textContent = concluidos;
   if (totalCountElem) totalCountElem.textContent = pendentes + concluidos;
+  aplicarVisibilidadeDasMetricas();
 }
 
 window.apagarRegistro = async (cpf) => {
@@ -436,6 +452,7 @@ window.apagarRegistro = async (cpf) => {
       confirmButtonColor: '#ffc107'
     });
   }
+  aplicarVisibilidadeDasMetricas();
 };
 
 
@@ -515,6 +532,8 @@ function calcularPrazoDoisDiasUteis(dataInicial) {
 function toggleMetrics() {
   const metricsBtn = document.querySelector('.metrics-btn');
   const metricsInfos = document.querySelectorAll('.metrics-info');
+  metricasVisiveis = !metricasVisiveis; // alterna o estado global
+  
   
   // Toggle botão
   metricsBtn.classList.toggle('active');
@@ -536,10 +555,31 @@ function toggleMetrics() {
   if (icon) {
     icon.style.transform = shouldShow ? 'rotate(180deg)' : 'rotate(0)';
   }
+    aplicarVisibilidadeDasMetricas();
 }
 
 // Exportar função para o escopo global
 window.toggleMetrics = toggleMetrics;
+
+function aplicarVisibilidadeDasMetricas() {
+  const metricsInfos = document.querySelectorAll('.metrics-info');
+  metricsInfos.forEach(info => {
+    if (metricasVisiveis) {
+      info.style.display = 'flex';
+      info.classList.add('visible');
+    } else {
+      info.style.display = 'none';
+      info.classList.remove('visible');
+    }
+  });
+
+  const metricsBtn = document.querySelector('.metrics-btn i');
+  if (metricsBtn) {
+    metricsBtn.style.transform = metricasVisiveis ? 'rotate(180deg)' : 'rotate(0)';
+  }
+}
+
+
 
 window.atualizarStatus = async (cpf) => {
   if (!usuarioLogado) {
@@ -616,3 +656,70 @@ limparBtn.addEventListener("click", () => {
 });
 
 carregarColaboradores();
+
+document.getElementById('download-excel-button').addEventListener('click', () => {
+  exportarColaboradoresParaExcel();
+});
+
+function exportarColaboradoresParaExcel() {
+  const mostrarMetricas = document.querySelector('.metrics-btn')?.classList.contains('active');
+  const tabela = document.querySelector('#tabelaColaboradores');
+  const linhas = tabela.querySelectorAll('tbody > tr');
+  const dados = [];
+
+  for (let i = 0; i < linhas.length; i++) {
+    const linha = linhas[i];
+
+    // Se for linha de métricas, ignorar
+    if (linha.classList.contains('metrics-row')) continue;
+
+    const colunas = linha.querySelectorAll('td');
+    if (colunas.length < 8) continue;
+
+    const nome = colunas[0]?.textContent?.trim() || '';
+    const unidade = colunas[1]?.textContent?.trim() || '';
+    const setor = colunas[2]?.textContent?.trim() || '';
+    const email = colunas[3]?.textContent?.trim() || '';
+    const telefone = colunas[4]?.textContent?.trim() || '';
+    const celular = colunas[5]?.textContent?.trim() || '';
+
+    const statusHeaderSpan = colunas[6].querySelector('.status-header span');
+    const statusTexto = statusHeaderSpan?.textContent?.split('Envio:')[0].trim() || '';
+
+    const registro = {
+      Nome: nome,
+      Unidade: unidade,
+      Setor: setor,
+      Email: email,
+      Telefone: telefone,
+      Celular: celular,
+      Status: statusTexto,
+    };
+
+    if (mostrarMetricas) {
+      const metricsRow = linhas[i + 1];
+      if (metricsRow?.classList.contains('metrics-row')) {
+  const metricasDiv = metricsRow.querySelector('.metrics-grid');
+  const metricItems = metricasDiv?.querySelectorAll('.metric-item') || [];
+
+  metricItems.forEach(item => {
+    const label = item.querySelector('.metric-label')?.textContent?.toLowerCase();
+    const value = item.querySelector('.metric-value')?.textContent?.trim() || '';
+
+    if (label.includes('envio')) registro.Envio = value;
+    if (label.includes('prazo')) registro.Prazo = value;
+    if (label.includes('conclusão')) registro.Conclusão = value;
+    if (label.includes('responsável')) registro.Responsável = value;
+  });
+}
+    }
+
+    dados.push(registro);
+  }
+
+  const ws = XLSX.utils.json_to_sheet(dados);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Colaboradores");
+  XLSX.writeFile(wb, "colaboradores.xlsx");
+}
+
