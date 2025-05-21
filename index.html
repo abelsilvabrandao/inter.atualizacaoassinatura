@@ -498,7 +498,7 @@
     <h2>Preencha os campos abaixo para solicitar a atualização de assinatura</h2>
     <form id="cadastroForm" class="form-grid">
       <div class="form-group">
-        <label for="unidade">Unidade:</label>
+        <label for="unidade">Unidade de Lotação (Endereço da unidade):</label>
         <select id="unidade" required>
         <option value="">Selecione a unidade</option>
         <option value="INTERSAL">INTERSAL</option>
@@ -522,7 +522,7 @@
     </select>
       </div>
       <div class="form-group">
-        <label for="nome">Nome do Colaborador (Na assinatura):</label>
+        <label for="nome">Nome do Colaborador (Irá aparecer na assinatura):</label>
         <input type="text" id="nome" required />
       </div>
       <div class="form-group">
@@ -557,12 +557,14 @@
       <div class="form-group">
         <label for="celularCorporativo">Celular Corporativo:</label>
         <input type="text" id="celularCorporativo" placeholder="(71) 9 9999-9999" />
+        <p class="lgpd-note">❗ De acordo com as diretrizes de compliance, somente números corporativos podem constar na assinatura de e-mail — números pessoais não podem ser mantidos.</p>
       </div>
+      
       <div class="form-group" style="grid-column: span 2;">
         <label>Assinatura Atual: <span class="required">*</span></label>
         <div class="signature-upload-area">
           <div id="pasteArea" class="paste-area">
-            <p><strong>Opção 1:</strong> No seu e-mail, selecione sua assinatura, clique com o botão direito do mouse e <strong>Copie</strong> ou use <strong>(Ctrl+C)</strong>, depois volte aqui e <strong>Cole (Ctrl+V)</strong> sua assinatura nesta área.</p>
+            <p><strong>Opção 1:</strong> No seu e-mail, selecione sua assinatura, clique com o botão direito do mouse e <strong>Copie</strong> ou use <strong>(Ctrl+C)</strong>, ou print apenas ela e depois volte aqui e <strong>Cole (Ctrl+V)</strong> sua assinatura nesta área.</p>
             <p><strong>Opção 2:</strong> Ou salve a imagem da assinatura no seu computador e clique no botão abaixo para fazer o upload.</p>
             <input type="file" id="fileInput" accept="image/*" style="display: none;">
             <button type="button" class="upload-btn" onclick="document.getElementById('fileInput').click()">

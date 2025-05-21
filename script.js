@@ -84,6 +84,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Validar e-mail corporativo
     const emailInput = document.getElementById('email');
+    emailInput.addEventListener('input', function() {
+    this.value = this.value.toLowerCase();
+    });
     if (emailInput) {
       const dominiosPermitidos = [
         '@intermaritima.com.br',
