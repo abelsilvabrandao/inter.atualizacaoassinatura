@@ -153,16 +153,16 @@ function extrairNomeDoEmail(email) {
 const tabela = document.querySelector('#tabelaColaboradores tbody');
 const unidadeSelect = document.getElementById('filterUnidade');
 if (unidadeSelect) {
-  unidadeSelect.addEventListener('change', () => {
-    carregarColaboradores(unidadeSelect.value, filtroSetor.value, filtroStatus.value);
-  });
+unidadeSelect.addEventListener('change', () => {
+  carregarColaboradores(unidadeSelect.value.trim(), filtroGeral.value.trim(), filtroStatus.value);
+});
 }
-const filtroSetor = document.getElementById('filtroSetor');
+const filtroGeral = document.getElementById('filtroGeral');
 const filtroStatus = document.getElementById('filtroStatus');
 const filtrarBtn = document.getElementById('filtrarBtn');
 const limparBtn = document.getElementById('limparBtn');
 
-async function carregarColaboradores(unidade = "", setor = "", status = "") {
+async function carregarColaboradores(unidade = "", buscaGeral = "", status = "") {
   try {
     tabela.innerHTML = `
       <tr>
@@ -177,7 +177,6 @@ async function carregarColaboradores(unidade = "", setor = "", status = "") {
 
 
     if (unidade) q = query(q, where("unidade", "==", unidade));
-    if (setor) q = query(q, where("setor", "==", setor));
     if (status) q = query(q, where("status", "==", status));
 
     const querySnapshot = await getDocs(q);
@@ -195,105 +194,130 @@ async function carregarColaboradores(unidade = "", setor = "", status = "") {
       atualizarContadores(0, 0);
       return;
     }
+    // Converter para array e aplicar filtro cliente para o setor
+    let colaboradores = [];
+    querySnapshot.forEach(docSnap => {
+      colaboradores.push({ id: docSnap.id, ...docSnap.data() });
+    });
+
+    if (buscaGeral) {
+    const termoBusca = buscaGeral.toLowerCase();
+    colaboradores = colaboradores.filter(colab => {
+    return (
+      (colab.nome && colab.nome.toLowerCase().includes(termoBusca)) ||
+      (colab.unidade && colab.unidade.toLowerCase().includes(termoBusca)) ||
+      (colab.setor && colab.setor.toLowerCase().includes(termoBusca)) ||
+      (colab.email && colab.email.toLowerCase().includes(termoBusca)) ||
+      (colab.telefoneFixo && colab.telefoneFixo.toLowerCase().includes(termoBusca)) ||
+      (colab.celularCorporativo && colab.celularCorporativo.toLowerCase().includes(termoBusca))
+    );
+  });
+}
+
+
+    if (colaboradores.length === 0) {
+      tabela.innerHTML = `
+        <tr>
+          <td colspan="8" class="no-results">
+            <i class="fas fa-info-circle"></i> Nenhum colaborador encontrado
+          </td>
+        </tr>
+      `;
+      atualizarContadores(0, 0);
+      return;
+    }
 
         // Inicializar contadores
     let pendentes = 0;
     let concluidos = 0;
 
-    querySnapshot.forEach((docSnap) => {
-      const data = docSnap.data();
-      // Contar status
-      if (data.status.toLowerCase() === 'pendente') {
-        pendentes++;
-      } else if (data.status.toLowerCase() === 'assinatura enviada') {
-        concluidos++;
-      }
-      
+colaboradores.forEach((data) => {
+  // Contar status
+  if (data.status.toLowerCase() === 'pendente') {
+    pendentes++;
+  } else if (data.status.toLowerCase() === 'assinatura enviada') {
+    concluidos++;
+  }
 
-      const tr = document.createElement("tr");
+  const tr = document.createElement("tr");
 
-      // Define status class and icon
-      let statusClass = '';
-      let statusIcon = '';
-      switch(data.status.toLowerCase()) {
-        case 'pendente':
-          statusClass = 'status-pendente';
-          statusIcon = 'clock';
-          break;
-        case 'assinatura enviada':
-          statusClass = 'status-aprovado';
-          statusIcon = 'check-circle';
-          break;
-        case 'rejeitado':
-          statusClass = 'status-rejeitado';
-          statusIcon = 'times-circle';
-          break;
-      }
+  let statusClass = '';
+  let statusIcon = '';
+  switch(data.status.toLowerCase()) {
+    case 'pendente':
+      statusClass = 'status-pendente';
+      statusIcon = 'clock';
+      break;
+    case 'assinatura enviada':
+      statusClass = 'status-aprovado';
+      statusIcon = 'check-circle';
+      break;
+    case 'rejeitado':
+      statusClass = 'status-rejeitado';
+      statusIcon = 'times-circle';
+      break;
+  }
 
-      // Calcular datas
-      const dataEnvio = data.dataEnvio ? new Date(data.dataEnvio) : null;
-      const dataPrazo = dataEnvio ? calcularPrazoDoisDiasUteis(dataEnvio) : null;
-      const dataConclusao = data.dataConclusao ? new Date(data.dataConclusao) : null;
-      
-      // Verificar status do prazo
-      let statusPrazo = '';
-      if (data.status === 'Assinatura Enviada' && dataConclusao && dataPrazo) {
-        statusPrazo = dataConclusao <= dataPrazo ? ' (No Prazo)' : ' (Atrasado)';
-        statusClass = dataConclusao <= dataPrazo ? 'status-no-prazo' : 'status-atrasado';
-      }
+  const dataEnvio = data.dataEnvio ? new Date(data.dataEnvio) : null;
+  const dataPrazo = dataEnvio ? calcularPrazoDoisDiasUteis(dataEnvio) : null;
+  const dataConclusao = data.dataConclusao ? new Date(data.dataConclusao) : null;
 
-      // Linha principal com informações básicas
-      // Linha principal com dados e ações
-      tr.innerHTML = `
-        <td>${data.nome}</td>
-        <td>${data.unidade}</td>
-        <td>${data.setor}</td>
-        <td>${data.email || '-'}</td>
-        <td>${data.telefoneFixo || '-'}</td>
-        <td>${data.celularCorporativo || '-'}</td>
-        <td class="${statusClass}">
-          <div class="status-container">
-            <div class="status-header">
-              <span><i class="fas fa-${statusIcon}"></i> ${data.status}${statusPrazo}</span>
-            </div>
-            ${data.dataEnvio ? `
-              <div class="metrics-info" style="display: none;">
-                <span class="metric-item">
-                  <i class="fas fa-paper-plane"></i> Envio: ${formatarData(new Date(data.dataEnvio))}
-                </span>
-                <span class="metric-item">
-                  <i class="fas fa-clock"></i> Prazo: ${formatarData(dataPrazo)}
-                </span>
-                ${data.dataConclusao ? `
-                  <span class="metric-item">
-                    <i class="fas fa-check-circle"></i> Conclusão: ${formatarData(new Date(data.dataConclusao))}
-                  </span>   
-                ` : ''}
-                    <span class="metric-item">
-                    <i class="fas fa-user"></i> Responsável: ${data.responsavel ? extrairNomeDoEmail(data.responsavel) : '-'}
-                  </span>
-              </div>
+  let statusPrazo = '';
+  if (data.status === 'Assinatura Enviada' && dataConclusao && dataPrazo) {
+    statusPrazo = dataConclusao <= dataPrazo ? ' (No Prazo)' : ' (Atrasado)';
+    statusClass = dataConclusao <= dataPrazo ? 'status-no-prazo' : 'status-atrasado';
+  }
+
+  tr.innerHTML = `
+    <td>${data.nome}</td>
+    <td>${data.unidade}</td>
+    <td>${data.setor}</td>
+    <td>${data.email || '-'}</td>
+    <td>${data.telefoneFixo || '-'}</td>
+    <td>${data.celularCorporativo || '-'}</td>
+    <td class="${statusClass}">
+      <div class="status-container">
+        <div class="status-header">
+          <span><i class="fas fa-${statusIcon}"></i> ${data.status}${statusPrazo}</span>
+        </div>
+        ${data.dataEnvio ? `
+          <div class="metrics-info" style="display: none;">
+            <span class="metric-item">
+              <i class="fas fa-paper-plane"></i> Envio: ${formatarData(new Date(data.dataEnvio))}
+            </span>
+            <span class="metric-item">
+              <i class="fas fa-clock"></i> Prazo: ${formatarData(dataPrazo)}
+            </span>
+            ${data.dataConclusao ? `
+              <span class="metric-item">
+                <i class="fas fa-check-circle"></i> Conclusão: ${formatarData(new Date(data.dataConclusao))}
+              </span>   
             ` : ''}
+            <span class="metric-item">
+              <i class="fas fa-user"></i> Responsável: ${data.responsavel ? extrairNomeDoEmail(data.responsavel) : '-'}
+            </span>
           </div>
-        </td>
-        <td>
-          <div class="acoes-wrapper">
-            ${data.status === "Pendente" ? `
-              <button onclick="atualizarStatus('${docSnap.id}')" class="acoes-btn aprovar-btn" title="Concluir">
-                <i class="fas fa-check"></i>
-              </button>
-            ` : ''}
-            ${data.oldSignature ? `
-              <button onclick="visualizarAssinaturaAntiga('${docSnap.id}')" class="acoes-btn visualizar-btn" title="Ver Assinatura Antiga">
-                <i class="fas fa-eye"></i>
-              </button>
-            ` : ''}
-            <button onclick="apagarRegistro('${docSnap.id}')" class="acoes-btn apagar-btn" title="Apagar Registro">
-              <i class="fas fa-trash"></i>
-            </button>
-          </div>
-        </td>
-      `;
+        ` : ''}
+      </div>
+    </td>
+    <td>
+      <div class="acoes-wrapper">
+        ${data.status === "Pendente" ? `
+          <button onclick="atualizarStatus('${data.id}')" class="acoes-btn aprovar-btn" title="Concluir">
+            <i class="fas fa-check"></i>
+          </button>
+        ` : ''}
+        ${data.oldSignature ? `
+          <button onclick="visualizarAssinaturaAntiga('${data.id}')" class="acoes-btn visualizar-btn" title="Ver Assinatura Antiga">
+            <i class="fas fa-eye"></i>
+          </button>
+        ` : ''}
+        <button onclick="apagarRegistro('${data.id}')" class="acoes-btn apagar-btn" title="Apagar Registro">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+    </td>
+  `;
 
       // Linha de métricas (oculta por padrão)
       const metricsRow = document.createElement('tr');
@@ -356,6 +380,12 @@ metricsRow.innerHTML = `
   }
 }
 
+// Adicionar listener para filtroStatus para carregar dados ao mudar seleção
+filtroStatus.addEventListener('change', () => {
+  carregarColaboradores(unidadeSelect.value.trim(), filtroGeral.value.trim(), filtroStatus.value);
+});
+
+
 // Função auxiliar para atualizar os contadores no display
 function atualizarContadores(pendentes, concluidos) {
   const pendentesCountElem = document.getElementById('pendentesCount');
@@ -388,7 +418,7 @@ window.apagarRegistro = async (cpf) => {
     if (result.isConfirmed) {
       const docRef = doc(db, "colaboradores", cpf);
       await deleteDoc(docRef);
-      carregarColaboradores(unidadeSelect.value, filtroSetor.value, filtroStatus.value);
+      carregarColaboradores(unidadeSelect.value, filtroGeral.value, filtroStatus.value);
       await Swal.fire({
         icon: 'success',
         title: 'Registro Apagado!',
@@ -398,7 +428,7 @@ window.apagarRegistro = async (cpf) => {
     }
   } catch (error) {
     console.error('Erro ao apagar registro:', error);
-    carregarColaboradores(unidadeSelect.value, filtroSetor.value, filtroStatus.value);
+    carregarColaboradores(unidadeSelect.value, filtroGeral.value, filtroStatus.value);
     await Swal.fire({
       icon: 'warning',
       title: 'Atenção',
@@ -558,7 +588,7 @@ window.atualizarStatus = async (cpf) => {
       confirmButtonText: 'Fechar',
       width: '550px'
     });
-    carregarColaboradores(unidadeSelect.value, filtroSetor.value, filtroStatus.value);
+    carregarColaboradores(unidadeSelect.value, filtroGeral.value, filtroStatus.value);
   } catch (error) {
     console.error('Erro ao atualizar status:', error);
     await Swal.fire({
@@ -573,14 +603,14 @@ window.atualizarStatus = async (cpf) => {
 filtrarBtn.addEventListener("click", () => {
   carregarColaboradores(
     unidadeSelect.value.trim(),
-    filtroSetor.value.trim(),
+    filtroGeral.value.trim(),
     filtroStatus.value
   );
 });
 
 limparBtn.addEventListener("click", () => {
   unidadeSelect.value = "";
-  filtroSetor.value = "";
+  filtroGeral.value = "";
   filtroStatus.value = "";
   carregarColaboradores();
 });

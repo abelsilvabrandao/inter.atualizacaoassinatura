@@ -595,17 +595,30 @@
         <i class="fas fa-chart-line"></i> Métricas e Prazos
       </button>
     </div>
-    <!-- Modal de Login -->
+<!-- Modal de Login -->
 <div id="loginModal" class="modal" style="display: block; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5);">
-  <div class="modal-content" style="background-color: #fefefe; margin: 15% auto; padding: 20px; border-radius: 8px; width: 300px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); position: relative;">
-    <button id="closeLoginModal" style="position: absolute; top: 10px; right: 10px; background: transparent; border: none; font-size: 20px; cursor: pointer;">&times;</button>
-    <h2>Login</h2>
-    <input type="email" id="loginEmail" placeholder="E-mail" style="width: 100%; padding: 8px; margin-bottom: 10px;"/>
-    <input type="password" id="loginPassword" placeholder="Senha" style="width: 100%; padding: 8px; margin-bottom: 10px;"/>
-    <button id="loginBtn" style="width: 100%; padding: 10px; background-color: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer;">Entrar</button>
-    <p id="loginError" style="color: red; margin-top: 10px; display: none;"></p>
+  <div class="modal-content" style="background-color: #fff; margin: 12% auto; padding: 30px 25px 20px; border-radius: 10px; width: 320px; box-shadow: 0 8px 30px rgba(0,0,0,0.2); font-family: sans-serif;">
+    <div style="text-align: center; margin-bottom: 15px;">
+      <img src="logo.png" alt="Logo" style="max-width: 150px; height: auto;">
+    </div>
+    <h2 style="text-align: center; color: var(--primary-color); margin-bottom: 20px;">Login</h2>
+    <p style="text-align: center; color: var(--text-color); margin-bottom: 20px;">Por favor, insira suas credenciais para acessar o sistema.</p>
+    <input type="email" id="loginEmail" placeholder="E-mail" style="width: 100%; padding: 10px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px;"/>
+    
+    <input type="password" id="loginPassword" placeholder="Senha" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px;"/>
+
+    <button id="loginBtn" style="width: 100%; padding: 10px; background-color: var(--primary-color); color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 15px; cursor: pointer; transition: background 0.2s;">
+      Entrar
+    </button>
+
+    <button id="closeLoginModal" style="width: 100%; padding: 10px; margin-top: 10px; background-color: #e0e0e0; color: #333; border: none; border-radius: 6px; font-size: 14px; cursor: pointer;">
+      Cancelar
+    </button>
+
+    <p id="loginError" style="color: red; margin-top: 12px; display: none; text-align: center;"></p>
   </div>
 </div>
+
 
 
 <div id="responsavelDisplay" style="margin: 10px 0; font-weight: 600; color: var(--primary-color); display: flex; align-items: center; gap: 10px;">
@@ -645,15 +658,14 @@
           <option value="SEDE 3º ANDAR">SEDE 3º ANDAR</option>  
         </select>
       </div>
-      
-      <div class="filter-group">
-        <label for="filtroSetor">
-          <i class="fas fa-sitemap"></i>
-          Filtrar por Setor:
-        </label>
-        <input type="text" id="filtroSetor" placeholder="Digite o setor" />
-      </div>
 
+      <div class="filter-group">
+      <label for="filtroSetor">
+      <i class="fas fa-search"></i>
+      Buscar:
+      </label>
+      <input type="text" id="filtroGeral" placeholder="Digite nome, unidade, setor..." />
+      </div>
       <div class="filter-group">
         <label for="filtroStatus">
           <i class="fas fa-info-circle"></i>
