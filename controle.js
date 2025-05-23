@@ -16,6 +16,7 @@ let usuarioLogado = null;
 
 import { signOut } from "https://www.gstatic.com/firebasejs/9.6.11/firebase-auth.js";
 
+
 document.addEventListener('DOMContentLoaded', () => {
   const loginEmail = document.getElementById('loginEmail');
   const loginPassword = document.getElementById('loginPassword');
@@ -76,6 +77,8 @@ onAuthStateChanged(auth, (user) => {
     document.getElementById('responsavelDisplay').style.display = 'flex';
     document.getElementById('loginDisplay').style.display = 'none';
     habilitarAcoes(true);
+    // Chama o listener em tempo real para notificações
+    configurarListenerColaboradores();
   } else {
     usuarioLogado = null;
     document.getElementById('responsavelDisplay').style.display = 'none';
@@ -555,6 +558,27 @@ window.apagarRegistro = async (cpf) => {
 
     await deleteDoc(docRef);
 
+    try {
+  const logRef = collection(db, "logs_exclusao");
+  await addDoc(logRef, {
+    colaborador: {
+      nome: data.nome || '',
+      cpf: cpf,
+      unidade: data.unidade || '',
+      setor: data.setor || '',
+      email: data.email || '',
+      status: data.status || ''
+    },
+    responsavel: {
+      nome: extrairNomeDoEmail(usuarioLogado.email),
+      email: usuarioLogado.email
+    },
+    dataHora: new Date().toISOString()
+  });
+} catch (logError) {
+  console.warn('Erro ao registrar log de exclusão:', logError);
+}
+
     await Swal.fire({
       icon: 'success',
       title: 'Registro Removido',
@@ -898,4 +922,27 @@ function exportarColaboradoresParaExcel() {
   XLSX.utils.book_append_sheet(wb, ws, "Colaboradores");
   XLSX.writeFile(wb, "colaboradores.xlsx");
 }
+
+function configurarListenerColaboradores() {
+  const colaboradoresRef = collection(db, "colaboradores");
+  onSnapshot(colaboradoresRef, (snapshot) => {
+    snapshot.docChanges().forEach(change => {
+      if (change.type === "modified") {
+        const data = change.doc.data();
+        if (data.status === "Assinatura Enviada") {
+          Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'success',
+            title: `o(a) ${data.nome} Acabou de solicitar atualização de assinatura!`,
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true
+          });
+        }
+      }
+    });
+  });
+}
+
 
