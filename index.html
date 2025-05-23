@@ -7,182 +7,20 @@
   <script src="https://unpkg.com/imask@6.4.3/dist/imask.min.js"></script>
   <script type="module" src="script.js" defer></script>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+</head>
+<body>
   <style>
-    :root {
-      --primary-color: #006400;
-      --secondary-color: #008000;
-      --accent-color: #90EE90;
-      --text-color: #004d00;
-      --light-bg: #E8F5E9;
-      --border-color: #90EE90;
-      --white: #FFFFFF;
-      --error: #D32F2F;
-      --warning: #FFA000;
-      --success: #006400;
-    }
-
-    body {
-      font-family: 'Roboto', sans-serif;
-      line-height: 1.6;
-      color: var(--text-color);
-      background-color: var(--light-bg);
-      margin: 0;
-      padding: 0;
-    }
-
-    .header {
-      background-color: white;
-      padding: 20px 0;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      position: relative;
-    }
-
-    .logo-container {
-      text-align: center;
-      margin-bottom: 20px;
-      position: relative;
-    }
-
-    .logo-container img {
-      height: 60px;
-      width: auto;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    .instructions {
-      background-color: white;
-      border-radius: 10px;
-      padding: 30px;
-      margin: 20px 0;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-      border: 1px solid var(--border-color);
-    }
-    .instruction-text {
-      margin-top: 20px;
-    }
-
-    .welcome-section {
-      text-align: center;
-      margin: 40px 0;
-      color: var(--primary-color);
-    }
-
-    .welcome-section h1 {
-      font-size: 2.5em;
-      margin-bottom: 10px;
-      color: var(--primary-color);
-    }
-
-    .subtitle {
-      font-size: 1.2em;
-      color: var(--secondary-color);
-      margin-bottom: 30px;
-    }
-
-    .form-section {
-      background-color: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-      margin-top: 40px;
-    }
-
-    .form-section h2 {
-      color: var(--primary-color);
-      margin-bottom: 25px;
-      text-align: center;
-    }
-
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-      margin-bottom: 30px;
-    }
-
-    @media (max-width: 768px) {
-      .form-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .form-group[style*="grid-column: span 2"] {
-        grid-column: auto !important;
-      }
-
-      .form-container {
-        margin: 10px;
-        padding: 15px;
-      }
-
-      .form-section {
-        padding: 15px;
-      }
-
-      .header {
-        padding: 10px 0;
-      }
-
-      .logo-container img {
-        height: 40px;
-      }
-
-      .welcome-section h1 {
-        font-size: 1.8em;
-      }
-
-      .subtitle {
-        font-size: 1em;
-      }
-    }
-
-    .form-group {
-      margin-bottom: 15px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 8px;
-      color: var(--primary-color);
-      font-weight: 500;
-    }
-
-    input, select {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid var(--border-color);
-      border-radius: 5px;
-      font-size: 14px;
-      transition: all 0.3s ease;
-    }
-
-    input:focus, select:focus {
-      border-color: var(--secondary-color);
-      box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
-    }
-
-    .input-validation-container {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-
-    .input-validation-container input {
-      width: 100%;
-    }
-
-    .validation-icon {
+        .validation-icon {
       position: absolute;
       right: 10px;
       display: none;
       font-size: 16px;
     }
-
     .valid-icon {
       color: #28a745;
     }
@@ -194,274 +32,7 @@
     .validation-icon.show {
       display: block;
     }
-
-    .email-suggestions {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
-      background: white;
-      border: 1px solid var(--border-color);
-      border-radius: 0 0 5px 5px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      display: none;
-      z-index: 1000;
-    }
-
-    .email-suggestions.show {
-      display: block;
-    }
-
-    .email-suggestion-item {
-      padding: 8px 12px;
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
-
-    .email-suggestion-item:hover {
-      background-color: var(--light-bg);
-    }
-
-    .signature-preview {
-      margin-top: 40px;
-      padding: 20px;
-      background-color: #f8f9fa;
-      border-radius: 10px;
-      text-align: center;
-    }
-
-    .signature-preview img {
-      max-width: 100%;
-      height: auto;
-      border: 1px solid var(--border-color);
-      border-radius: 5px;
-    }
-
-    .tutorial-section {
-      margin: 40px 0;
-      padding: 30px;
-      background-color: #f8f9fa;
-      border-radius: 10px;
-      border: 1px solid var(--border-color);
-    }
-
-    .tutorial-section h3 {
-      color: var(--primary-color);
-      margin-bottom: 20px;
-      text-align: center;
-      font-size: 1.5em;
-    }
-
-    .video-container {
-      position: relative;
-      width: 100%;
-      max-width: 600px;
-      margin: 0 auto 20px;
-    }
-
-    .video-container::before {
-      content: '';
-      display: block;
-      padding-top: 56.25%; /* 16:9 Aspect Ratio */
-    }
-
-    .video-container iframe {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-
-    .tutorial-steps {
-      text-align: center;
-      color: var(--text-color);
-      margin-top: 20px;
-      font-size: 1.1em;
-    }
-
-    button[type="submit"] {
-      background-color: var(--primary-color);
-      color: white;
-      padding: 12px 30px;
-      border: none;
-      border-radius: 5px;
-      font-size: 16px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      display: block;
-      margin: 30px auto;
-      width: auto;
-    }
-
-    button[type="submit"]:hover {
-      background-color: var(--secondary-color);
-      transform: translateY(-2px);
-    }
-    .contact-info {
-      margin-top: 20px;
-    }
-
-    .signature-upload-area {
-      border: 2px dashed var(--border-color);
-      border-radius: 8px;
-      padding: 20px;
-      margin-top: 10px;
-      background-color: var(--light-bg);
-    }
-
-    .signature-preview {
-      text-align: center;
-      margin-top: 15px;
-    }
-
-    .signature-preview img {
-      max-width: 100%;
-      max-height: 200px;
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
-      margin-bottom: 10px;
-    }
-
-    .paste-area {
-      text-align: center;
-      padding: 20px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .paste-area:hover {
-      background-color: var(--accent-color);
-      opacity: 0.8;
-    }
-
-    .paste-area p {
-      margin-bottom: 15px;
-      line-height: 1.6;
-    }
-
-    .paste-area p strong {
-      color: var(--primary-color);
-    }
-
-    .upload-btn {
-      background-color: var(--primary-color);
-      color: white;
-      padding: 8px 16px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    .upload-btn:hover {
-      background-color: var(--secondary-color);
-    }
-
-    .image-preview {
-      margin-top: 15px;
-      text-align: center;
-    }
-
-    .image-preview img {
-      max-width: 100%;
-      max-height: 200px;
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
-    }
-
-    @media (max-width: 768px) {
-      .image-preview img {
-        max-height: 120px;
-      }
-
-      .signature-upload-area {
-        padding: 10px;
-        margin-top: 5px;
-      }
-
-      .paste-area {
-        padding: 15px;
-      }
-
-      .paste-area p {
-        font-size: 0.9em;
-        line-height: 1.4;
-        margin-bottom: 10px;
-      }
-
-      .upload-btn,
-      .remove-btn {
-        padding: 6px 12px;
-        font-size: 13px;
-      }
-    }
-
-    .remove-btn {
-      background-color: #dc3545;
-      color: white;
-      padding: 6px 12px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      margin-top: 10px;
-      font-size: 14px;
-    }
-
-    .remove-btn:hover {
-      background-color: #c82333;
-    }
-
-    .admin-button {
-      position: absolute;
-      top: 5px;
-      right: 20px;
-      padding: 8px 16px;
-      background-color: #1f6916;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.3s ease;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    }
-
-    .admin-button:hover {
-      background-color: #129c39;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    }
-
-    .admin-button i {
-      font-size: 16px;
-    }
-
-    select {
-      padding: 8px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      width: 300px;
-      font-size: 14px;
-      background-color: white;
-    }
-
-    select:focus {
-      outline: none;
-      border-color: #4CAF50;
-      box-shadow: 0 0 5px rgba(76,175,80,0.2);
-    }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-</head>
-<body>
     <div id="particles-js"></div>
     
     <div class="header">
@@ -471,8 +42,7 @@
       <button id="adminButton" class="admin-button">
         <i class="fas fa-user-shield"></i> Admin
       </button>
-    </div>
-    
+    </div>   
 
   <div class="container">
     <div class="welcome-section">
@@ -650,33 +220,47 @@
     </div>
   </div>
   <script>
-  document.getElementById('adminButton').addEventListener('click', async () => {
-    const { value: formValues } = await Swal.fire({
-      title: 'Login Admin',
-      html:
-        '<input id="swal-input-user" class="swal2-input" placeholder="Usuário">' +
-        '<input id="swal-input-pass" type="password" class="swal2-input" placeholder="Senha">',
-      focusConfirm: false,
-      showCancelButton: true,
-      confirmButtonText: 'Entrar',
-      preConfirm: () => {
-        return [
-          document.getElementById('swal-input-user').value,
-          document.getElementById('swal-input-pass').value
-        ];
-      }
-    });
+document.getElementById('adminButton').addEventListener('click', async () => {
+  const { value: formValues } = await Swal.fire({
+    title: '<img src="logo.png" alt="Logo da Empresa" style="height: 60px; margin-bottom: 15px;"><br>Login de Administrador',
+    html:
+      '<input id="swal-input-user" class="swal2-input" placeholder="Digite seu usuário">' +
+      '<input id="swal-input-pass" type="password" class="swal2-input" placeholder="Digite sua senha">',
+    focusConfirm: false,
+    showCancelButton: true,
+    confirmButtonText: 'Entrar',
+    cancelButtonText: 'Cancelar',
+    didOpen: () => {
+      const userInput = document.getElementById('swal-input-user');
+      const passInput = document.getElementById('swal-input-pass');
 
-    if (formValues) {
-      const [usuario, senha] = formValues;
-
-      if (usuario === "admin" && senha === "COPEmatt001") {
-        window.location.href = "controle.html";
-      } else {
-        Swal.fire('Erro', 'Usuário ou senha incorretos', 'error');
+      function enterKeyListener(e) {
+        if (e.key === 'Enter') {
+          Swal.clickConfirm();
+        }
       }
+
+      userInput.addEventListener('keydown', enterKeyListener);
+      passInput.addEventListener('keydown', enterKeyListener);
+    },
+    preConfirm: () => {
+      return [
+        document.getElementById('swal-input-user').value,
+        document.getElementById('swal-input-pass').value
+      ];
     }
   });
+
+  if (formValues) {
+    const [usuario, senha] = formValues;
+
+    if (usuario === "admin" && senha === "COPEmatt001") {
+      window.location.href = "controle.html";
+    } else {
+      Swal.fire('Erro', 'Usuário ou senha incorretos', 'error');
+    }
+  }
+});
 </script>
 <script>
 // Funções para manipulação da imagem da assinatura

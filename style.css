@@ -52,7 +52,6 @@ body {
   width: auto;
 }
 
-
 .footer {
   margin-top: auto;
   background-color: var(--white);
@@ -417,4 +416,5 @@ button[type="submit"]:hover, .btn-primary:hover {
   margin-top: 5px;
   font-style: italic;
 }
+
 
