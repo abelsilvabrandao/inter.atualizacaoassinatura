@@ -206,13 +206,13 @@
       border-radius: 5px;
     }
 
-    .tutorial-section {
-      margin: 40px 0;
-      padding: 30px;
-      background-color: #f8f9fa;
-      border-radius: 10px;
-      border: 1px solid var(--border-color);
-    }
+.tutorial-section {
+  display: flex;
+  justify-content: center; /* Centraliza horizontalmente */
+  align-items: center;     /* Centraliza verticalmente, se necessário */
+  flex-direction: column;  /* Mantém os elementos em coluna */
+  gap: 10px;               /* Espaçamento entre o vídeo e o texto */
+}
 
     .tutorial-section h3 {
       color: var(--primary-color);
@@ -221,29 +221,15 @@
       font-size: 1.5em;
     }
 
-    .video-container {
-      position: relative;
-      width: 100%;
-      max-width: 600px;
-      margin: 0 auto 20px;
-    }
+    .tutorial-section video {
+  border: 4px solid #28a745; /* Borda verde */
+  border-radius: 15px;        /* Cantos arredondados */
+  max-width: 100%;            /* Responsivo para telas menores */
+  height: auto;               /* Mantém a proporção */
+  box-sizing: border-box;     /* Inclui a borda no tamanho total */
+}
 
-    .video-container::before {
-      content: '';
-      display: block;
-      padding-top: 56.25%; /* 16:9 Aspect Ratio */
-    }
-
-    .video-container iframe {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-
+ 
     .tutorial-steps {
       text-align: center;
       color: var(--text-color);
