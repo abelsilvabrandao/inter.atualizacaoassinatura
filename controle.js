@@ -7,7 +7,9 @@ import {
   doc,
   query,
   where,
-  getDoc
+  getDoc,
+  onSnapshot,
+  addDoc
 } from "https://www.gstatic.com/firebasejs/9.6.11/firebase-firestore.js";
 
 import { auth } from './firebase.js';
@@ -22,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const loginPassword = document.getElementById('loginPassword');
   const loginBtn = document.getElementById('loginBtn');
   habilitarAcoes(false);
+  configurarListenerPendentes();
   function enterKeyListener(e) {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -32,6 +35,54 @@ document.addEventListener('DOMContentLoaded', () => {
   if (loginEmail) loginEmail.addEventListener('keydown', enterKeyListener);
   if (loginPassword) loginPassword.addEventListener('keydown', enterKeyListener);
 });
+
+function configurarListenerPendentes() {
+  const badge = document.getElementById('pendingNotificationBadge');
+  const colaboradoresRef = collection(db, "colaboradores");
+  const q = query(colaboradoresRef, where("status", "==", "Pendente"));
+
+onSnapshot(q, (snapshot) => {
+  const pendentesCount = snapshot.size;
+  const badge = document.getElementById('pendingNotificationBadge');
+
+  if (pendentesCount > 0) {
+    badge.style.display = 'inline-block';
+    badge.textContent = pendentesCount;
+
+    // Obter nomes dos colaboradores pendentes
+    const nomesPendentes = snapshot.docs.map(doc => doc.data().nome).join(', ');
+
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'warning',
+      title: `Existem ${pendentesCount} assinaturas pendentes: ${nomesPendentes}`,
+      showConfirmButton: false,
+      timer: 6000,
+      timerProgressBar: true,
+      width: '350px',
+      customClass: {
+        popup: 'swal2-toast-custom'
+      }
+    });
+  } else {
+    badge.style.display = 'none';
+    document.title = 'Painel de Controle de Assinaturas';
+  }
+
+  // Atualizar título da página com número de pendentes
+  if (pendentesCount > 0) {
+    document.title = `(${pendentesCount}) Painel de Controle de Assinaturas`;
+  } else {
+    document.title = 'Painel de Controle de Assinaturas';
+  }
+
+  const pendentesTotalElem = document.getElementById('pendentesTotalCount');
+  if (pendentesTotalElem) pendentesTotalElem.textContent = pendentesCount;
+});
+
+}
+
 
 
 let metricasVisiveis = false;
