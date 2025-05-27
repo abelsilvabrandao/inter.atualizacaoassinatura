@@ -29,7 +29,7 @@ Comparativo entre assinatura antiga e novo modelo:
 
 | Novo Modelo | Antigo Modelo |
 |-------------|---------------|
-| ![Novo](assinaturaexemplo.png) | ![Antigo](modelo%20antigo.jpg) |
+| ![Novo](assinaturaexemplo.png) | ![Antigo](modelo-antigo.png) |
 
 ---
 
